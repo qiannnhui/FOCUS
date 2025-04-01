@@ -1,0 +1,11 @@
+**/__pycache__/
+**/data/
+**/*.png
+**/*.jpg
+**/*.JPG
+**/DUTS/
+**/ECSSD/
+**/VISA/
+**/MVTEC/
+**/mvtec_good/
+**/*.zip
