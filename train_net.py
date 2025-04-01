@@ -56,6 +56,9 @@ from focus import (
 
 )
 
+import datasets.ECSSD, datasets.DUTS, datasets.MVTEC, datasets.mvtec_good, datasets.VISA
+
+
 class Trainer(DefaultTrainer):
     """
     Extension of the Trainer class adapted to MaskFormer.
@@ -91,7 +94,7 @@ class Trainer(DefaultTrainer):
     @classmethod
     def build_train_loader(cls, cfg):
 
-
+        
         if cfg.INPUT.DATASET_MAPPER_NAME == "focus_dataset_mapper":
             mapper = FocusDatasetMapper(cfg, True)
             return build_detection_train_loader(cfg, mapper=mapper)
@@ -280,7 +283,6 @@ def main(args):
 
 
 if __name__ == "__main__":
-
 
     args = default_argument_parser().parse_args()
     print("Command Line Args:", args)

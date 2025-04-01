@@ -25,7 +25,8 @@ MODEL:
     PRETRAIN_IMG_SIZE: 518 #384
     DEFORM_NUM_HEADS: 24
     INTERACTION_INDEXES: [[0, 9], [10, 19], [20, 29], [30, 39]]
-  WEIGHTS: "./ckpt/dinov2_vitg14_pretrain_updated.pkl"
+  WEIGHTS: "./weights/focus_giant_sod.pth"
+  # WEIGHTS: "./ckpt/dinov2_vitg14_pretrain_updated.pkl"
   PIXEL_MEAN: [123.675, 116.280, 103.530]
   PIXEL_STD: [58.395, 57.120, 57.375]
   MASK_FORMER:
@@ -94,7 +95,9 @@ MODEL:
 
 DATASETS:
   TRAIN: ("duts_train",)
-  TEST: ("duts_val", "pascal","hkuis", "dutomron", "ecssd",)
+  TEST: ("visa", "mvtec_good",)
+  # TEST: ("duts_val", "ecssd",)
+  # TEST: ["duts_val", "pascal","hkuis", "dutomron", "ecssd"]
   
 SOLVER:
   IMS_PER_BATCH: 8

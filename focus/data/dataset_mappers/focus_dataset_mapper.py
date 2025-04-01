@@ -86,8 +86,11 @@ class FocusDatasetMapper:
 
         # Assume always applies to the training set.
         dataset_names = cfg.DATASETS.TRAIN
+        print(f"dataset_names: {dataset_names}")
         meta = MetadataCatalog.get(dataset_names[0])
+        print(f"meta: {meta}")
         ignore_label = meta.ignore_label
+        print(f"ignore_label: {ignore_label}")
 
         ret = {
             "is_train": is_train,
