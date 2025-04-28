@@ -57,6 +57,7 @@ from focus import (
 )
 
 import datasets.ECSSD, datasets.DUTS, datasets.MVTEC, datasets.mvtec_good, datasets.VISA
+module_09 = __import__("datasets.09")
 
 
 class Trainer(DefaultTrainer):

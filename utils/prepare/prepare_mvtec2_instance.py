@@ -188,7 +188,7 @@ def create_dataset(dataset_root, output_dir):
         "categories": all_categories
     }
     os.makedirs(output_dir, exist_ok=True)
-    output_train_file = os.path.join(output_dir, "09_train_INSTANCE.json")
+    output_train_file = os.path.join(output_dir, "mvtec2_train_INSTANCE.json")
     with open(output_train_file, 'w') as f:
         json.dump(coco_train_format, f)
     print(f"Saved Train INSTANCE Segmentation JSON: {output_train_file}")
@@ -199,14 +199,14 @@ def create_dataset(dataset_root, output_dir):
         "annotations": test_annotations,
         "categories": all_categories
     }
-    output_test_file = os.path.join(output_dir, "09_val_INSTANCE.json")
+    output_test_file = os.path.join(output_dir, "mvtec2_val_INSTANCE.json")
     with open(output_test_file, 'w') as f:
         json.dump(coco_test_format, f)
     print(f"Saved Test INSTANCE Segmentation JSON: {output_test_file}")
 
 if __name__ == "__main__":
-    dataset_root = "datasets/09"
-    output_root = "datasets/09"
+    dataset_root = "datasets/MVTEC2"
+    output_root = "datasets/MVTEC2"
 
     # 呼叫函數來產生 train 和 test 資料的 JSON 檔案
     create_dataset(dataset_root, output_root)
@@ -373,8 +373,8 @@ if __name__ == "__main__":
 
 
 # if __name__ == "__main__":
-#     dataset_root = "datasets/09"
-#     output_root = "datasets/09"
+#     dataset_root = "datasets/MVTEC"
+#     output_root = "datasets/MVTEC"
 
 #     categories = [d for d in os.listdir(dataset_root) if os.path.isdir(os.path.join(dataset_root, d))]
 

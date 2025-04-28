@@ -20,7 +20,7 @@ def create_instance_dataset(category_dir, dataset_type, output_dir, category_nam
     ann_id = 1
 
     # 遞迴尋找所有子資料夾內的圖片
-    image_files = sorted(glob.glob(os.path.join(category_dir, "**", "*.png"), recursive=True))
+    image_files = sorted(glob.glob(os.path.join(category_dir, "**", "*.jpg"), recursive=True))
 
     for img_id, image_file in tqdm(enumerate(image_files, start=1), total=len(image_files)):
         relative_path = os.path.relpath(image_file, category_dir)
@@ -37,18 +37,19 @@ def create_instance_dataset(category_dir, dataset_type, output_dir, category_nam
 
         if dataset_type == "test":
             gt_path = copy.deepcopy(image_file)
-            gt_path = gt_path.replace("test", "ground_truth")
-            mask_file = gt_path.replace(".png", "_mask.png")
+            gt_path = gt_path.replace("test/09", "ground_truth/09/test")
+            mask_file = gt_path.replace(".jpg", "_mask.png")
             gt_file_name = copy.deepcopy(file_name)
-            gt_file_name = gt_file_name.replace("test", "ground_truth")
-            gt_file_name = gt_file_name.replace(".png", "_mask.png")
+            gt_file_name = gt_file_name.replace("test", "ground_truth/09/test")
+            gt_file_name = gt_file_name.replace(".jpg", "_mask.png")
 
             if not os.path.exists(mask_file):
                 continue
 
             # 讀取 mask
             mask = np.array(Image.open(mask_file).convert("L"))
-            binary_mask = (mask > 128).astype(np.uint8)
+            binary_mask = (mask > 15).astype(np.uint8)
+            # binary_mask = (mask > 128).astype(np.uint8)
             rle = mask_util.encode(np.asfortranarray(binary_mask))
             rle['counts'] = rle['counts'].decode('utf-8')
 
@@ -87,7 +88,7 @@ def create_semantic_dataset(category_dir, dataset_type, category_id, category_na
     ann_id = 1
 
     # 遍歷所有 PNG 圖像
-    image_files = sorted(glob.glob(os.path.join(category_dir, dataset_type, "**", "*.png"), recursive=True))
+    image_files = sorted(glob.glob(os.path.join(category_dir, dataset_type, "**", "*.jpg"), recursive=True))
 
     for img_id, image_file in tqdm(enumerate(image_files, start=1), total=len(image_files)):
         relative_path = os.path.relpath(image_file, category_dir)
@@ -107,10 +108,10 @@ def create_semantic_dataset(category_dir, dataset_type, category_id, category_na
         if dataset_type == "test":
             gt_path = copy.deepcopy(image_file)
             gt_path = gt_path.replace("test", "ground_truth")
-            mask_file = gt_path.replace(".png", "_mask.png")
+            mask_file = gt_path.replace(".jpg", "_mask.png")
             gt_file_name = copy.deepcopy(file_name)
             gt_file_name = gt_file_name.replace("test", "ground_truth")
-            gt_file_name = gt_file_name.replace(".png", "_mask.png")
+            gt_file_name = gt_file_name.replace(".jpg", "_mask.png")
             # print("mask_filename = ", mask_file)
             # print(os.path.exists(mask_file))
             if not os.path.exists(mask_file):

@@ -7,77 +7,6 @@ import pycocotools.mask as mask_util
 import copy
 from tqdm import tqdm
 
-
-def create_instance_dataset(category_dir, dataset_type, output_dir, category_name):
-    """
-    Convert dataset into COCO Instance Segmentation format.
-
-    - Suitable for Mask R-CNN.
-    - Objects are individually labeled.
-    """
-    images = []
-    annotations = []
-    ann_id = 1
-
-    # 遞迴尋找所有子資料夾內的圖片
-    image_files = sorted(glob.glob(os.path.join(category_dir, "**", "*.png"), recursive=True))
-
-    for img_id, image_file in tqdm(enumerate(image_files, start=1), total=len(image_files)):
-        relative_path = os.path.relpath(image_file, category_dir)
-        file_name = os.path.join(category_name, relative_path)
-        image = Image.open(image_file)
-        width, height = image.size
-
-        images.append({
-            "id": img_id,
-            "file_name": file_name,
-            "width": width,
-            "height": height
-        })
-
-        if dataset_type == "test":
-            gt_path = copy.deepcopy(image_file)
-            gt_path = gt_path.replace("test", "ground_truth")
-            mask_file = gt_path.replace(".png", "_mask.png")
-            gt_file_name = copy.deepcopy(file_name)
-            gt_file_name = gt_file_name.replace("test", "ground_truth")
-            gt_file_name = gt_file_name.replace(".png", "_mask.png")
-
-            if not os.path.exists(mask_file):
-                continue
-
-            # 讀取 mask
-            mask = np.array(Image.open(mask_file).convert("L"))
-            binary_mask = (mask > 128).astype(np.uint8)
-            rle = mask_util.encode(np.asfortranarray(binary_mask))
-            rle['counts'] = rle['counts'].decode('utf-8')
-
-            bbox = mask_util.toBbox(rle).tolist()
-            area = mask_util.area(rle).tolist()
-
-            annotations.append({
-                "id": ann_id,
-                "file_name": gt_file_name,
-                "image_id": img_id,
-                "category_id": 1,
-                "segmentation": rle,
-                "area": area,
-                "bbox": bbox,
-                "iscrowd": 0
-            })
-            ann_id += 1
-
-    categories = [{"id": 1, "name": "foreground", "supercategory": "foreground"}]
-    coco_format = {"images": images, "annotations": annotations, "categories": categories}
-
-    # os.makedirs(output_dir, exist_ok=True)
-    # output_file = os.path.join(output_dir, f"{category_name}_{dataset_type}_INSTANCE.json")
-
-    # with open(output_file, 'w') as f:
-    #     json.dump(coco_format, f)
-    # print(f"Saved Instance Segmentation JSON: {output_file}")
-    return images, annotations
-
 def create_semantic_dataset(category_dir, dataset_type, category_id, category_name):
     """
     Convert dataset into COCO Semantic Segmentation format.
@@ -87,7 +16,7 @@ def create_semantic_dataset(category_dir, dataset_type, category_id, category_na
     ann_id = 1
 
     # 遍歷所有 PNG 圖像
-    image_files = sorted(glob.glob(os.path.join(category_dir, dataset_type, "**", "*.png"), recursive=True))
+    image_files = sorted(glob.glob(os.path.join(category_dir, dataset_type, "**", "*.jpg"), recursive=True))
 
     for img_id, image_file in tqdm(enumerate(image_files, start=1), total=len(image_files)):
         relative_path = os.path.relpath(image_file, category_dir)
@@ -106,11 +35,11 @@ def create_semantic_dataset(category_dir, dataset_type, category_id, category_na
         # print("image_file = ", image_file)
         if dataset_type == "test":
             gt_path = copy.deepcopy(image_file)
-            gt_path = gt_path.replace("test", "ground_truth")
-            mask_file = gt_path.replace(".png", "_mask.png")
+            gt_path = gt_path.replace("test/09", "ground_truth/09/test")
+            mask_file = gt_path.replace(".jpg", "_mask.png")
             gt_file_name = copy.deepcopy(file_name)
-            gt_file_name = gt_file_name.replace("test", "ground_truth")
-            gt_file_name = gt_file_name.replace(".png", "_mask.png")
+            gt_file_name = gt_file_name.replace("test/09", "ground_truth/09/test")
+            gt_file_name = gt_file_name.replace(".jpg", "_mask.png")
             # print("mask_filename = ", mask_file)
             # print(os.path.exists(mask_file))
             if not os.path.exists(mask_file):
@@ -119,7 +48,8 @@ def create_semantic_dataset(category_dir, dataset_type, category_id, category_na
             continue
 
         mask = np.array(Image.open(mask_file).convert("L"))
-        foreground_mask = (mask > 128).astype(np.uint8)
+        foreground_mask = (mask > 15).astype(np.uint8)
+        # foreground_mask = (mask > 128).astype(np.uint8)
         background_mask = (mask == 0).astype(np.uint8)
 
         fg_rle = mask_util.encode(np.asfortranarray(foreground_mask))
@@ -167,14 +97,14 @@ def create_dataset(dataset_root, output_dir):
         # 處理 train 資料
         train_path = os.path.join(category_dir, "train")
         if os.path.exists(train_path):
-            category_images, category_annotations = create_instance_dataset(category_dir, "train", category_id, category)
+            category_images, category_annotations = create_semantic_dataset(category_dir, "train", category_id, category)
             train_images.extend(category_images)
             train_annotations.extend(category_annotations)
 
         # 處理 test 資料
         test_path = os.path.join(category_dir, "test")
         if os.path.exists(test_path):
-            category_images, category_annotations = create_instance_dataset(category_dir, "test", category_id, category)
+            category_images, category_annotations = create_semantic_dataset(category_dir, "test", category_id, category)
             test_images.extend(category_images)
             test_annotations.extend(category_annotations)
 
@@ -188,10 +118,10 @@ def create_dataset(dataset_root, output_dir):
         "categories": all_categories
     }
     os.makedirs(output_dir, exist_ok=True)
-    output_train_file = os.path.join(output_dir, "09_train_INSTANCE.json")
+    output_train_file = os.path.join(output_dir, "09_train_SEMANTIC.json")
     with open(output_train_file, 'w') as f:
         json.dump(coco_train_format, f)
-    print(f"Saved Train INSTANCE Segmentation JSON: {output_train_file}")
+    print(f"Saved Train Semantic Segmentation JSON: {output_train_file}")
 
     # 儲存 test 資料
     coco_test_format = {
@@ -199,10 +129,10 @@ def create_dataset(dataset_root, output_dir):
         "annotations": test_annotations,
         "categories": all_categories
     }
-    output_test_file = os.path.join(output_dir, "09_val_INSTANCE.json")
+    output_test_file = os.path.join(output_dir, "09_val_SEMANTIC.json")
     with open(output_test_file, 'w') as f:
         json.dump(coco_test_format, f)
-    print(f"Saved Test INSTANCE Segmentation JSON: {output_test_file}")
+    print(f"Saved Test Semantic Segmentation JSON: {output_test_file}")
 
 if __name__ == "__main__":
     dataset_root = "datasets/09"

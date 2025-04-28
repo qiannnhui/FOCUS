@@ -32,6 +32,7 @@ try:
 except ImportError:
     COCOeval_opt = COCOeval
 
+import cv2
 
 class UNIFIEDEvaluator(DatasetEvaluator):
     """
@@ -230,7 +231,23 @@ class UNIFIEDEvaluator(DatasetEvaluator):
 
                 pred_binary_mask = np.array(mask_util.decode(pred_mask), dtype=np.float32)
                 gt_binary_mask = np.array(mask_util.decode(gt_mask["segmentation"]), dtype=np.float32)
+                print("ploting masks \n")
 
+                # pred_mask = np.array(mask_util.decode(pred_mask), dtype=np.uint8) * 255  # OpenCV expects uint8 0-255
+                # gt_mask = np.array(mask_util.decode(gt_mask["segmentation"]), dtype=np.uint8) * 255
+
+                # cv2.imwrite("./gt_binary_mask.png", gt_binary_mask*255)
+                # cv2.imwrite("./pred_binary_mask.png", pred_binary_mask*255)
+                print("pred_binary_mask shape ori: ", pred_binary_mask.shape)
+                print("gt_binary_mask shape ori: ", gt_binary_mask.shape)
+                target_h = max(pred_binary_mask.shape[0], gt_binary_mask.shape[0])
+                target_w = max(pred_binary_mask.shape[1], gt_binary_mask.shape[1])
+                pred_binary_mask = cv2.resize(pred_binary_mask, (target_w, target_h), interpolation=cv2.INTER_NEAREST) if pred_binary_mask.shape != (target_w, target_h) else pred_binary_mask
+                gt_binary_mask = cv2.resize(gt_binary_mask, (target_w, target_h), interpolation=cv2.INTER_NEAREST) if gt_binary_mask.shape != (target_w, target_h) else gt_binary_mask
+                # pred_binary_mask = cv2.resize(pred_binary_mask, (481, 641), interpolation=cv2.INTER_NEAREST)
+                # gt_binary_mask = cv2.resize(gt_binary_mask, (481, 641), interpolation=cv2.INTER_NEAREST)
+                print("pred_binary_mask shape: ", pred_binary_mask.shape)
+                print("gt_binary_mask shape: ", gt_binary_mask.shape)
                 result1, result2, result3, result4, result9 =utils.calc_metrics(pred_binary_mask,gt_binary_mask)
                 if self.dataset_name != "pascal":
                     result5 = utils.calc_ber(pred_binary_mask,gt_binary_mask)

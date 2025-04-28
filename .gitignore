@@ -8,3 +8,9 @@
 **/MVTEC/
 **/mvtec_good/
 **/*.zip
+**/ckpt/
+**/configs/
+**/detectron2/
+**/outputs/
+**/weights/
+./focus/modeling/pixel_decoder/*
