@@ -16,6 +16,7 @@ from . import (
     register_mvtec,
     # register_mvtec2,
     register_09_val,
+    register_new09_DS,
     register_mvtec_good,
     register_visa,
 )
