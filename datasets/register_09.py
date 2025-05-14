@@ -84,7 +84,7 @@ _PREDEFINED_SPLITS_MVTEC = {
         None,  # `train` 不需要 semantic segmentation
         "09/09_train_INSTANCE.json",  # `train` 仍然需要 Instance JSON（即便 annotations 為空）
     ),
-    "09_val": (
+    "09_validation": (
         "09",  # `test` 圖片
         "09",  # `test` ground truth
         "09/09_val_SEMANTIC.json",  # `test` semantic segmentation

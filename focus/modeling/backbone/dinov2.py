@@ -27,6 +27,7 @@ import math
 from functools import partial
 from typing import Callable, Optional
 import torch.utils.checkpoint as cp
+import matplotlib.pyplot as plt
 
 class Mlp(nn.Module):
     def __init__(
@@ -739,6 +740,16 @@ class EdgeEnhancer(TIMMVisionTransformer):
                 return blk(x, H, W, return_attention=True)
 
     def forward(self, x):
+        # # plot feature map, plot original image
+        # import random
+        # idx = random.randint(0, 100000)
+        # for n in range(x.shape[0]):
+        #     ori_img = x.clone()
+        #     ori_img = ori_img[n].cpu().numpy().transpose(1, 2, 0)
+        #     # ori_img = x[0].cpu().numpy().transpose(1, 2, 0)
+        #     ori_img = (ori_img - ori_img.min()) / (ori_img.max() - ori_img.min())
+
+        #     plt.imsave(f'feature_maps/{idx}_{n}_input_image.png', ori_img)
         deform_inputs1, deform_inputs2 = deform_inputs(x, self.patch_size)
 
         # Edge Information Extraction
@@ -775,6 +786,7 @@ class EdgeEnhancer(TIMMVisionTransformer):
                 ],
             )
         outs = list()
+        # extract feature from different layers from Dino
         for i, layer in enumerate(self.interactions):
             indexes = self.interaction_indexes[i]
             if self.use_cls:
@@ -803,6 +815,19 @@ class EdgeEnhancer(TIMMVisionTransformer):
                     W_toks,
                 )
             outs.append(x.transpose(1, 2).view(bs, dim, H_toks, W_toks).contiguous())
+
+            # # plot feature map
+            # for n in range(x.shape[0]):
+            #     feature_map = x.detach().cpu().transpose(1, 2).view(bs, dim, H_toks, W_toks).contiguous()
+            #     # plt.imsave(f'input_images/{idx}_input_image.png', x[0].cpu().numpy().transpose(1, 2, 0), cmap='gray')
+            #     for t in range(feature_map.shape[1]):
+            #         if (t%100 == 0) and (t != 0):
+            #             feature_map_i = feature_map[n, t].numpy()
+            #             plt.imsave(f'feature_maps/{idx}_{n}_feature_map_layer_{i}_dim_{t}.png', feature_map_i, cmap='gray')
+            #         else:
+            #             continue
+            # # plt.imsave(f'feature_maps/{idx}_feature_map_{i}.png', feature_map[0].numpy())
+
         mask = None
         #PCA for feature mask initialization
         if self.training:
@@ -832,7 +857,7 @@ class EdgeEnhancer(TIMMVisionTransformer):
             x2 = F.interpolate(x2, size=(2 * H_c, 2 * W_c), mode="bilinear", align_corners=False)
             x3 = F.interpolate(x3, size=(1 * H_c, 1 * W_c), mode="bilinear", align_corners=False)
             x4 = F.interpolate(x4, size=(H_c // 2, W_c // 2), mode="bilinear", align_corners=False)
-            # print(c1.shape, c2.shape, c3.shape, c4.shape, x1.shape, x2.shape, x3.shape, x4.shape, H_c, H_toks)
+            print(c1.shape, c2.shape, c3.shape, c4.shape, x1.shape, x2.shape, x3.shape, x4.shape, H_c, H_toks)
             c1, c2, c3, c4 = c1 + x1, c2 + x2, c3 + x3, c4 + x4
 
         # Final Norm
