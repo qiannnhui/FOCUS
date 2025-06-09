@@ -249,7 +249,7 @@ class UNIFIEDEvaluator(DatasetEvaluator):
                 # print("pred_binary_mask shape: ", pred_binary_mask.shape)
                 # print("gt_binary_mask shape: ", gt_binary_mask.shape)
                 result1, result2, result3, result4, result9 =utils.calc_metrics(pred_binary_mask,gt_binary_mask)
-                if self.dataset_name not in ["pascal", "new09_DS"]:
+                if self.dataset_name not in ["pascal", "09_val"]:
                     print("dataset name: ", self.dataset_name)
                     result5 = utils.calc_ber(pred_binary_mask,gt_binary_mask)
                     result6,result7,_,_ = utils.calc_f1(pred_binary_mask,gt_binary_mask)
@@ -257,7 +257,7 @@ class UNIFIEDEvaluator(DatasetEvaluator):
                 s_measure_scores.append(result1)
                 e_measure_scores.append(result2)
                 wfm_scores.append(result3)
-                if self.dataset_name not in ["pascal", "new09_DS"]:
+                if self.dataset_name not in ["pascal", "09_val"]:
                     ber_scores.append(result5)
                     f1_score.append(result6)
                     auc_score.append(result7)

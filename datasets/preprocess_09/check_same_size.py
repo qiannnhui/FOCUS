@@ -1,8 +1,8 @@
 import cv2
 import glob
 
-image_dir = "resized_folder/images"
-mask_dir = "resized_folder/ground_truth_mask"
+image_dir = "09_val/images"
+mask_dir = "09_val/ground_truth_mask"
 
 image_files = sorted(glob.glob(f"{image_dir}/*.jpg"))
 mask_files = sorted(glob.glob(f"{mask_dir}/*.png"))
