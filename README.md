@@ -28,7 +28,7 @@ We introduce **FOCUS**, **F**oreground **O**bje**C**ts **U**niversal **S**egment
 ### Environment Setup
 There are 2 ways to setup, one is to directly download an docker image and create a container on your own, the other is to setup the environment step by step.
 #### Docker File
-1. Downloading an image from [focus_env_image]()
+1. Access image from tmp2 called `focus_env.tar`
 2. Import
 ```bash
 docker import focus_env.tar focus_img
