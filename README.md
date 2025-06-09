@@ -26,6 +26,31 @@ We introduce **FOCUS**, **F**oreground **O**bje**C**ts **U**niversal **S**egment
 ## Getting Started
 
 ### Environment Setup
+There are 2 ways to setup, one is to directly download an docker image and create a container on your own, the other is to setup the environment step by step.
+#### Docker File
+1. Downloading an image from [focus_env_image]()
+2. Import
+```bash
+docker import focus_env.tar focus_img
+```
+3. Create your own container from the image
+```bash
+docker run -it --runtime=nvidia --gpus all \
+  --device=/dev/nvidia-uvm \
+  --device=/dev/nvidia-uvm-tools \
+  --device=/dev/nvidia-modeset \
+  --device=/dev/nvidiactl \
+  --device=/dev/nvidia0 \
+  --device=/dev/nvidia1 \
+  --device=/dev/nvidia2 \
+  --device=/dev/nvidia3 \
+  --shm-size=128g \
+  --mount type=bind,source=/tmp2/qiannnhui,target=/home \
+  --name focus_env \
+  focus_img /bin/bash
+```
+
+#### Setup Steps
 * We use CUDA 12.2 for implementation.
 * Our code is built upon Pytorch 2.1.1, please make sure you are using PyTorch ≥ 2.1 and matched torchvision. Besides, please check PyTorch version matches that is required by Detectron2.
 * We train our models on  2 NVIDIA A6000 GPUs with 48G memory, please make sure that your VRAM is sufficient to avoid the potential OOM issues during training.
@@ -123,6 +148,12 @@ python utils/prepare/prepare_<dataset>.py
 # e.g. python utils/prepare/prepare_camo.py
 ```
 
+There are some datasets in the anomaly detection form, to turn it as the form above, try the script in `datasets/preprocess_09/anomaly_to_FGBG`.
+Furthermore, the "09" dataset didn't map the size of input image and ground image well, and we'll have to turn its multiple class mask to a single class mask. Thus, we provided a script to preprocess it, including prepare it's json file.
+```bash
+./preprocess_09.sh
+```
+
 
 ### Prepare Pretrained Weights
 
@@ -155,6 +186,13 @@ python train_net.py --eval-only \
 --config-file path/to/your/config \
 --num-gpus NUM_GPUS \
 MODEL.WEIGHTS path/to/your/weights
+```
+
+Note that there is a script to run this command called `run_inference.sh`. If there's an assertion fault in `detectron2`, simply comment it out.
+
+## Draw the Ouput
+```bash
+./save_output.sh
 ```
 
 ## Citation
