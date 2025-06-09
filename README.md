@@ -149,6 +149,7 @@ python utils/prepare/prepare_<dataset>.py
 ```
 
 There are some datasets in the anomaly detection form, to turn it as the form above, try the script in `datasets/preprocess_09/anomaly_to_FGBG`.
+
 Furthermore, the "09" dataset didn't map the size of input image and ground image well, and we'll have to turn its multiple class mask to a single class mask. Thus, we provided a script to preprocess it, including prepare it's json file.
 ```bash
 ./preprocess_09.sh
