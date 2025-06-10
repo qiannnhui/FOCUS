@@ -28,7 +28,7 @@ We introduce **FOCUS**, **F**oreground **O**bje**C**ts **U**niversal **S**egment
 ### Environment Setup
 There are 2 ways to setup, one is to directly download an docker image and create a container on your own, the other is to setup the environment step by step.
 #### Docker File
-1. Access image from tmp2 called `focus_env.tar`
+1. Access image from `tmp2/handover` called `focus_env.tar`
 2. Import
 ```bash
 docker import focus_env.tar focus_img
@@ -44,8 +44,8 @@ docker run -it --runtime=nvidia --gpus all \
   --device=/dev/nvidia1 \
   --device=/dev/nvidia2 \
   --device=/dev/nvidia3 \
-  --shm-size=128g \
-  --mount type=bind,source=/tmp2/qiannnhui,target=/home \
+  --shm-size={shared memory size} \
+  --mount type=bind,source={place you wantto mount},target=/home \
   --name focus_env \
   focus_img /bin/bash
 ```
